@@ -1,16 +1,16 @@
-# Zebra Simple bench
+# Zebra Simple Test
 
 Implementation of [Zebra Puzzle](https://en.wikipedia.org/wiki/Zebra_Puzzle) for LLM, simple variation of [ZebraLogic](https://huggingface.co/blog/yuchenlin/zebra-logic) bench.
 
 It runs N random zebra puzzles of specified SIZE for each model from MODELS.
 
-Stores json log for each model and sumary, prints model answers and totals.
+Stores json log for each model and summary, prints model answers and totals.
 
-Key differences from ZeroEval:
+Key differences from [ZeroEval](https://github.com/WildEval/ZeroEval):
 - requires only `openai` and `duckdb` pip packages and access to APIs
 - works via OpenAI API also with Groq, Google, Anthropic and DeepSeek
-- switches thinking mode with model suffix none/default/low/medium/high for all APIs
-- extracts <think> or <thought> tag reasoning to separate thought data from results
+- switches thinking mode with model suffix `none/default/low/medium/high` for all APIs
+- extracts `&lt;think&gt;` or `&lt;thought&gt;` tag reasoning to separate thought data from results
 - DOES NOT implement any other benches except zebra puzzle of specified size
 
 
@@ -60,8 +60,8 @@ zebra_run.py -s 2*2 -n 10 -t 1024 -m models.txt
 
 - model should contain OpenAI API compatible model name, optional reasoining_effort suffix and `@source`
 - each source addressed via OpenAI API with key from environment variable as `GOOGLE_API_KEY` for `@google`
-- reasoning_effort controlled by suffix after the model name: `none`, `default`, `low`, `medium`, `high`
-- @google and @nvidia have specific way of defining thinking mode to allow catch <think> or <thought> tags
+- `reasoning_effort` controlled by suffix after the model name: `none`, `default`, `low`, `medium`, `high`
+- @google and @nvidia have specific way of defining thinking mode to allow catch &lt;think&gt; or &lt;thought&gt; tags
 - full model name example: `gemini-2.5-flash-preview-05-20-low@google`
 
 **Models by source**
@@ -97,7 +97,7 @@ nvidia/llama-3.1-nemotron-ultra-253b-v1-high@nvidia # free for devs, have <think
 gemini-2.5-pro-exp-03-25-none@google                # pro is not free
 gemini-2.5-flash-preview-05-20-default@google       # have <thought>
 gemini-2.0-flash@google                             # no reasoning
-qwen/qwen3-32b-default@groq                         # reasoning none and default, default have <think>
+qwen/qwen3-32b-default@groq                         # reasoning none and default, have <think>
 qwen-qwq-32b@groq                                   # no reasoning control, but have <think>
 deepseek-r1-distill-llama-70b@groq                  # no reasoning control, but have <think>
 llama-3.3-70b-versatile@groq                        # no reasoning
@@ -120,7 +120,7 @@ allam-2-7b@groq                                     # no reasoning, weak and goo
 - 2025-06-12 Initial version with dataset load (ow, original ZebraLogic by allenai/ZeroEval have no solution)
 - 2025-06-13 Extracted and modified prompt from [ZeroEval](https://github.com/WildEval/ZeroEval), completion request and results comparison logic
 - 2025-06-14 Created results saving logic, tested models from different sources, improved completion request
-- 2025-06-15 Research for `reasoning_effort` and similars to control thinking, extract <think> and <thought>
+- 2025-06-15 Research for `reasoning_effort` and similars to control thinking, extract &lt;think&gt; and &lt;thought&gt;
 - 2025-06-16 Polished results for easy usage by Creative Workshop team, prepared for publishing repos
 
 
