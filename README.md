@@ -1,7 +1,9 @@
 # Zebra Simple bench
 
 Implementation of [Zebra Puzzle](https://en.wikipedia.org/wiki/Zebra_Puzzle) for LLM, simple variation of [ZebraLogic](https://huggingface.co/blog/yuchenlin/zebra-logic) bench.
+
 It runs N random zebra puzzles of specified SIZE for each model from MODELS.
+
 Stores json log for each model and sumary, prints model answers and totals.
 
 Key differences from ZeroEval:
@@ -57,9 +59,9 @@ zebra_run.py -s 2*2 -n 10 -t 1024 -m models.txt
 **Common rules**
 
 - model should contain OpenAI API compatible model name, optional reasoining_effort suffix and `@source`
-- each source addressed via OpenAI API with key from environment variable, `GOOGLE_API_KEY` for `@google` and so on
-- reasoning_effort controlled by suffix after the model name, supported: `none`, `default`, `low`, `medium`, `high`
-- BTW, @google and @nvidia have specific way of defining thinking mode to allow catch <think> or <thought> tags
+- each source addressed via OpenAI API with key from environment variable as `GOOGLE_API_KEY` for `@google`
+- reasoning_effort controlled by suffix after the model name: `none`, `default`, `low`, `medium`, `high`
+- @google and @nvidia have specific way of defining thinking mode to allow catch <think> or <thought> tags
 - full model name example: `gemini-2.5-flash-preview-05-20-low@google`
 
 **Models by source**
@@ -86,39 +88,39 @@ zebra_run.py -s 2*2 -n 10 -t 1024 -m models.txt
 **Models examples**
 
 ```sh
-gpt-4.1-nano-high@openai							# no free
-claude-sonnet-4-0-high@anthropic					# no free
-deepseek-reasoner-high@deepseek 					# no free
-grok-3-mini-high@xai								# no free
-nvidia/llama-3.1-nemotron-70b-instruct@nvidia 		# free for devs, no reasoning
+gpt-4.1-nano-high@openai                            # no free
+claude-sonnet-4-0-high@anthropic                    # no free
+deepseek-reasoner-high@deepseek                     # no free
+grok-3-mini-high@xai                                # no free
+nvidia/llama-3.1-nemotron-70b-instruct@nvidia       # free for devs, no reasoning
 nvidia/llama-3.1-nemotron-ultra-253b-v1-high@nvidia # free for devs, have <think>
-gemini-2.5-pro-exp-03-25-none@google				# pro is not free
-gemini-2.5-flash-preview-05-20-default@google		# have <thought>
-gemini-2.0-flash@google								# no reasoning
-qwen/qwen3-32b-default@groq							# reasoning none and default, default have <think>
-qwen-qwq-32b@groq									# no reasoning control, but have <think>
-deepseek-r1-distill-llama-70b@groq					# no reasoning control, but have <think>
-llama-3.3-70b-versatile@groq						# no reasoning
-llama3-8b-8192@groq									# no reasoning
-gemma2-9b-it@groq									# no reasoning	
-allam-2-7b@groq										# no reasoning, weak and good to test size 2*2
+gemini-2.5-pro-exp-03-25-none@google                # pro is not free
+gemini-2.5-flash-preview-05-20-default@google       # have <thought>
+gemini-2.0-flash@google                             # no reasoning
+qwen/qwen3-32b-default@groq                         # reasoning none and default, default have <think>
+qwen-qwq-32b@groq                                   # no reasoning control, but have <think>
+deepseek-r1-distill-llama-70b@groq                  # no reasoning control, but have <think>
+llama-3.3-70b-versatile@groq                        # no reasoning
+llama3-8b-8192@groq                                 # no reasoning
+gemma2-9b-it@groq                                   # no reasoning  
+allam-2-7b@groq                                     # no reasoning, weak and good to test size 2*2
 ```
 
 
 ## Acknowledgements
 
 1. First thanks to Creative Workshop team inspired to do this simple test
-2. Authors of ZebraLogic bench and paper https://arxiv.org/abs/2502.01100 created good and reusable results, nice work!
-3. Thanks for WildEval team published useful dataset with solutions https://huggingface.co/datasets/WildEval/ZebraLogic
-4. And my warmest thanks from my heart to author of Sherlock game https://www.kaser.com/sherwin.html implementing puzzle
+2. Authors of ZebraLogic and paper https://arxiv.org/abs/2502.01100 created good and reusable results, nice work!
+3. Thanks for WildEval published useful dataset with solutions https://huggingface.co/datasets/WildEval/ZebraLogic
+4. And warmest thanks from my heart to author of Sherlock game https://www.kaser.com/sherwin.html implementing puzzle
    Many hours in my childhood I spent with this great game, currently game available as open-source Watson and on mobile
 
 ## History
 
-- 2025-06-12 Initial version with dataset analysis (found that original ZebraLogic by allenai/ZeroEval have no solutions)
-- 2025-06-13 Extracted and modified prompt from ZeroEval, added completion request and results comparison logic
+- 2025-06-12 Initial version with dataset load (ow, original ZebraLogic by allenai/ZeroEval have no solution)
+- 2025-06-13 Extracted and modified prompt from [ZeroEval](https://github.com/WildEval/ZeroEval), completion request and results comparison logic
 - 2025-06-14 Created results saving logic, tested models from different sources, improved completion request
-- 2025-06-15 Research for `reasoning_effort` usage and same params to control thinking, extracted <think> and <thought>
+- 2025-06-15 Research for `reasoning_effort` and similars to control thinking, extract <think> and <thought>
 - 2025-06-16 Polished results for easy usage by Creative Workshop team, prepared for publishing repos
 
 
