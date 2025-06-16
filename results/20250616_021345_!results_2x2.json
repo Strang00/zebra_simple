@@ -1,0 +1,12 @@
+{
+    "duration": "0:04:08.697332",
+    "size": "2*2",
+    "count": 10,
+    "max_tokens": 1024,
+    "models_summary": {
+        "nvidia/llama-3.1-nemotron-70b-instruct@nvidia": 90,
+        "nvidia/llama-3.1-nemotron-ultra-253b-v1@nvidia": 100,
+        "gemini-2.5-flash-preview-05-20-none@google": 100,
+        "gemini-2.5-flash-preview-05-20-low@google": 100
+    }
+}
