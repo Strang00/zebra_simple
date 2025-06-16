@@ -78,7 +78,7 @@ def download_zebra_dataset():
         f.write(r.content)
 
     
-def get_zebra_dataset(size = "2*2", random = False):
+def get_zebra_dataset(size = "2*2", randomize = False):
     """
     Return zebra grid_mode dataset as records list filtered by size, used local parquet file
     Currently dataset contains 40 items for each size from '2*2' to '6*6', total 1000 items
@@ -93,8 +93,9 @@ def get_zebra_dataset(size = "2*2", random = False):
     con = duckdb.connect()
     data = con.sql(f'''SELECT id, puzzle, solution from 'datasets/zebra_grid_mode.parquet' where size='{size}' order by created_at, id''').df()
     res = data.to_dict(orient='records')
-    if (random): random.shuffle(res)
     
+    if randomize: 
+        random.shuffle(res)    
     return res
 
 
@@ -424,20 +425,19 @@ def normalize_filename(fn):
     return out    
 
 
-def zebra_run(models, size, count, max_tokens):
+def zebra_run(dataset, models, size, max_tokens):
     """
     Main zebra test function, doing all work:
-    - load dataset of passed ~size~ and pick ~count~ random items
     - for each model in ~models~ query same picked items with ~max_tokens~ limit
     - for each model in ~models~ write details to json file
-    - print final results as list 'model: success_rate'
+    - print final results and write summary to !results file
     """
     lastmodel = None
     lastrun = None
     started = datetime.datetime.now()
     run_prefix = started.strftime('%Y%m%d_%H%M%S')
-    dataset = get_zebra_dataset(size, random=True)[:count]
     models_summary = {}
+    count = len(dataset)
 
     for model in models:
         print(f'Testing {count} items {size} on {model}')
@@ -507,23 +507,25 @@ def zebra_run(models, size, count, max_tokens):
             filename = f"results/{run_prefix}_{normalize_filename(model)}_{size.replace('*','x')}.json"
             with open(filename, "w") as f:
                 json.dump(results, f, indent=4)
-            print(f'Saved {filename}')
+            print(f'Saved model tests to {filename}')
         except Exception as ex:
             print(f'FAILED to save {filename}')
             print(ex)
 
-    print(f'Finished processing {len(models)} models * {count} tests in {datetime.datetime.now()-started}')
+    print(f'Finished processing {len(models)} models * {count} items in {datetime.datetime.now()-started}')
 
     summary = { 
         "duration": str(datetime.datetime.now()-started), 
-        "size": size, 
+        "size": size,
         "count": count, 
         "max_tokens": max_tokens, 
         "models_summary": models_summary
     }
+    print("Summary:", summary)
+    
     filename = f"results/{run_prefix}_!results_{size.replace('*','x')}.json"
     with open(filename, "w") as f:
         json.dump(summary, f, indent=4)
-    print(f'Saved {filename}')
+    print(f'Saved tests summary to {filename}')
 
     return summary

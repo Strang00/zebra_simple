@@ -2,9 +2,10 @@
 
 Implementation of [Zebra Puzzle](https://en.wikipedia.org/wiki/Zebra_Puzzle) for LLM, simple variation of [ZebraLogic](https://huggingface.co/blog/yuchenlin/zebra-logic) bench.
 
-It runs N random zebra puzzles of specified SIZE for each model from MODELS.
-
-Stores json log for each model and summary, prints model answers and totals.
+What it does exactly:
+- loads [ZebraLogic dataset](https://huggingface.co/datasets/WildEval/ZebraLogic) for local work if none yet
+- queries and checks N zebra puzzles of specified SIZE for each MODEL in list
+- stores json log for each model and summary, extracts model answer and think
 
 Key differences from [ZeroEval](https://github.com/WildEval/ZeroEval):
 - requires only `openai` and `duckdb` pip packages and access to APIs
@@ -29,8 +30,11 @@ export GROQ_API_KEY="set your key for @groq models"
 export GOOGLE_API_KEY="set your key for @google models"
 export NVIDIA_API_KEY="set your key for @nvidia models"
 
-# Run 10 zebra puzzles 2*2 with max_tokens=1024 for each model in models.txt
-zebra_run.py -s 2*2 -n 10 -t 1024 -m models.txt
+# Run 10 random zebra puzzles 2*2 for models from models.txt
+python -u zebra.py -f models.txt -s 2*2 -r 10
+
+# Run 2 exact zebra puzzles 3*3 #0 and #1 for one Groq model
+python -u zebra.py -m llama-3.3-70b-versatile@groq -s 3*3 -i 0,1 -t 4096
 ```
 
 
@@ -113,7 +117,7 @@ allam-2-7b@groq                                     # no reasoning, weak and goo
 2. Authors of ZebraLogic and paper https://arxiv.org/abs/2502.01100 created good and reusable results, nice work!
 3. Thanks for WildEval published useful dataset with solutions https://huggingface.co/datasets/WildEval/ZebraLogic
 4. And warmest thanks from my heart to author of Sherlock game https://www.kaser.com/sherwin.html implementing puzzle
-   Many hours in my childhood I spent with this great game, currently game available as open-source Watson and on mobile
+   Many hours in my childhood I spent with this great game, now game available as [Watson](https://github.com/koro-xx/Watson) and [Sherlok](https://apps.apple.com/ru/app/sherlock-free/id631434866)
 
 ## History
 
@@ -122,9 +126,10 @@ allam-2-7b@groq                                     # no reasoning, weak and goo
 - 2025-06-14 Created results saving logic, tested models from different sources, improved completion request
 - 2025-06-15 Research for `reasoning_effort` and similars to control thinking, extract `<think>` or `<thought>`
 - 2025-06-16 Polished results for easy usage by Creative Workshop team, prepared for publishing repos
+- 2025-06-16 Added support command-line arguments and usage help, added direct models in args and items list
 
 
-## TODO
+## Tasks
 
 - [x] Add and test zebra_run.py
 - [x] Add saving parquet if not exists, do not store in our repos, read license
@@ -132,4 +137,4 @@ allam-2-7b@groq                                     # no reasoning, weak and goo
 - [x] Add delay option between tests (bypassing RPM/TPM free limits)
 - [x] Add and fill LICENSE, check used parts license and reference here
 - [x] Collect links to models and keys retrival, models examples with comments
-- [ ] Implement command-line args retrieval and usage help output
+- [x] Implement command-line args retrieval and usage help output
