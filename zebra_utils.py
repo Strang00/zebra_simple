@@ -24,7 +24,7 @@ def get_zebra_grid_prompt(item):
     num_houses = len(item["solution"]["rows"])
     columns = item["solution"]["header"]
     assert columns[0] == "House"
-    json_template = {"reasoning": "___", "solution": {}}
+    json_template = {"solution": {}} # "reasoning": "___", 
     for i in range(num_houses):
         json_template["solution"][f'House {i+1}'] = {columns[j]: "___" for j in range(1, len(columns))}
     json_str = json.dumps(json_template, indent=4)
@@ -361,13 +361,10 @@ def openai_chat_request(
                 f"OpenAI API response have no content: {choice.finish_reason}"
             )
 
-        thought, text = extract_think(choice.message.content)
-        contents.append(text)
+        contents.append(choice.message.content)
 
         if hasattr(choice.message, 'reasoning_content') and choice.message.reasoning_content is not None:
-            thoughts.append(thought + choice.message.reasoning_content)
-        elif thought:
-            thoughts.append(thought)
+            thoughts.append(choice.message.reasoning_content)
 
     #if o1_mode:
     #    return contents, hidden_reasoning_tokens, response.usage
@@ -394,7 +391,7 @@ def extract_json(text):
     return '', text.strip()
 
 
-def generate_result_item(item, prompt, answer, success, thought, usage):
+def generate_result_item(item, prompt, answer, success, usage):
     """
     Generate result item as dictionary, used for one prompt iteration
     """
@@ -405,7 +402,6 @@ def generate_result_item(item, prompt, answer, success, thought, usage):
         "prompt": prompt,
         "solution": (get_zebra_grid_solution(item)),
         "answer": answer,
-        "thought": thought,
         "usage": usage,
     }
 
@@ -461,15 +457,20 @@ def zebra_run(dataset, models, size, max_tokens):
             solution_expected = get_zebra_grid_solution(item)
             thought = None
             usage = None
+            answer = {}
+            answers = []
 
             print(item['id'])
 
             try:
                 answers, thoughts, usage = openai_chat_request(model, prompt=prompt, max_tokens=max_tokens, json_mode=False)
                 if usage is not None: total_tokens += usage['total_tokens']
-                jsonstr, text = extract_json(answers[0])
+                jsonstr, text = extract_json(''.join(answers))
+                thought, text = extract_think(text)
                 answer = json.loads(jsonstr)
-                thought = thoughts[0] if len(thoughts) > 0 else None
+                answer['reasoning'] = text
+                if len(thought): thoughts.append(thought)
+                if len(thoughts): answer['thought'] = ''.join(thoughts)
 
                 solution_answered = answer['solution']
                 print('Expected:', solution_expected)
@@ -479,13 +480,15 @@ def zebra_run(dataset, models, size, max_tokens):
             except Exception as ex:
                 print(ex)
                 success = False
+                if answer == {} and len(answers): 
+                    answer['message'] = answers[0]
                 if hasattr(ex, 'body'):
-                    answer = ex.body
+                    answer['error'] = ex.body
                 else:
-                    answer = str(ex)
+                    answer['error'] = str(ex)
             print(('FAILURE', 'SUCCESS')[success])
 
-            res_items.append(generate_result_item(item, prompt, answer, success, thought, usage))
+            res_items.append(generate_result_item(item, prompt, answer, success, usage))
 
         results = {
             "model": model,

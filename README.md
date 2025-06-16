@@ -114,10 +114,10 @@ allam-2-7b@groq                                     # no reasoning, weak and goo
 ## Acknowledgements
 
 1. First thanks to Creative Workshop team inspired to do this simple test
-2. Authors of ZebraLogic and paper https://arxiv.org/abs/2502.01100 created good and reusable results, nice work!
-3. Thanks for WildEval published useful dataset with solutions https://huggingface.co/datasets/WildEval/ZebraLogic
-4. And warmest thanks from my heart to author of Sherlock game https://www.kaser.com/sherwin.html implementing puzzle
-   Many hours in my childhood I spent with this great game, now game available as [Watson](https://github.com/koro-xx/Watson) and [Sherlok](https://apps.apple.com/ru/app/sherlock-free/id631434866)
+2. Authors of ZebraLogic and [paper](https://arxiv.org/abs/2502.01100) created good and reusable results, nice work!
+3. Big Thanks for WildEval published useful [dataset](https://huggingface.co/datasets/WildEval/ZebraLogic) with solutions 
+4. And warmest thanks to author of [Sherlock game](https://www.kaser.com/sherwin.html) implementing puzzle.
+   Many happy hours I spent with this game, now it available as [Watson desktop](https://github.com/koro-xx/Watson) and [Sherlok mobile](https://apps.apple.com/ru/app/sherlock-free/id631434866)
 
 ## History
 
@@ -131,7 +131,7 @@ allam-2-7b@groq                                     # no reasoning, weak and goo
 
 ## Tasks
 
-- [x] Add and test zebra_run.py
+- [x] Add and test zebra.py
 - [x] Add saving parquet if not exists, do not store in our repos, read license
 - [x] Add config.py and results to .gitignore
 - [x] Add delay option between tests (bypassing RPM/TPM free limits)

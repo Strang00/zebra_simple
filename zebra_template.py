@@ -13,8 +13,9 @@ There are 3 houses, numbered 1 to 3 from left to right, as seen from across the 
 
 ## Answer to the Example Puzzle
 
+Reasoning: Given Clue 1, we know Peter is in House 2. According to Clue 2, Arnold is directly left of the one who only drinks water. The person in House 3 cannot be on the left of anyone, so Arnold must be in House 1. Thus, Peter drinks water, and Eric lives in House 3. Then, according to Clue 3, Eric drinks milk. Therefore, Arnold drinks tea.
+
 {
-    "reasoning": "Given Clue 1, we know Peter is in House 2. According to Clue 2, Arnold is directly left of the one who only drinks water. The person in House 3 cannot be on the left of anyone, so Arnold must be in House 1. Thus, Peter drinks water, and Eric lives in House 3. Then, according to Clue 3, Eric drinks milk. Therefore, Arnold drinks tea.",
     "solution": {
         "House 1": {
             "Name": "Arnold",
@@ -38,7 +39,9 @@ There are 3 houses, numbered 1 to 3 from left to right, as seen from across the 
 
 # Instruction
 
-Now please solve the above puzzle. Present your reasoning and solution in the following json format, nothing except json in answer:
+Now please solve the above puzzle. Present your reasoning and solution in the following format:
+
+Reasoning: ...
 
 {json_template}
 

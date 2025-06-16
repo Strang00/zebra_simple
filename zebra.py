@@ -5,9 +5,6 @@ import zebra_utils
 #import config
 #config.update_environ()
 
-# TODO: print usage help on no arguments
-# TODO: extract params from command line
-
 filename = None
 size = None
 items = None
