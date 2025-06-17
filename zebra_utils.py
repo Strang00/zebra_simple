@@ -49,6 +49,9 @@ def get_zebra_grid_solution(item):
         solution_comparable[key] = obj
     return solution_comparable
 
+    
+def dict_equals_casefold(d1, d2):
+    return re.sub(r'\s|-', '', str(d1).casefold()) == re.sub(r'\s|-', '', str(d2).casefold())
 
 # Based on ZeroEval, modified (removed dataset loading and optimized random pick)
 def zebra_test(dataset):
@@ -341,7 +344,7 @@ def openai_chat_request(
         )
 
     print(f"Received response from OpenAI API with model {model}")
-    print(response)
+    print(str(response).encode('utf-8', 'ignore'))
     contents = []
     thoughts = []
     for choice in response.choices:
@@ -385,9 +388,9 @@ def extract_json(text):
     """
     Split text onto json and remaining part
     """
-    m = re.search(r'\{(.*(?:.*\{.*\}.*)*)\}', text, re.DOTALL)
+    m = re.search(r'```json\s+(\{(.*(?:.*\{.*\}.*)*)\})\s+```', text, re.DOTALL)
     if m:
-        return m[0], text[:m.start()].strip() + text[m.end():].strip()
+        return m[1], text[:m.start()].strip() + text[m.end():].strip()
     return '', text.strip()
 
 
@@ -465,17 +468,17 @@ def zebra_run(dataset, models, size, max_tokens):
             try:
                 answers, thoughts, usage = openai_chat_request(model, prompt=prompt, max_tokens=max_tokens, json_mode=False)
                 if usage is not None: total_tokens += usage['total_tokens']
-                jsonstr, text = extract_json(''.join(answers))
-                thought, text = extract_think(text)
+                thought, text = extract_think(''.join(answers))
+                jsonstr, text = extract_json(text)
                 answer = json.loads(jsonstr)
-                answer['reasoning'] = text
+                answer['text'] = text
                 if len(thought): thoughts.append(thought)
                 if len(thoughts): answer['thought'] = ''.join(thoughts)
 
                 solution_answered = answer['solution']
                 print('Expected:', solution_expected)
                 print('Answered:', solution_answered)
-                success = solution_expected == solution_answered
+                success = dict_equals_casefold(solution_expected, solution_answered)
                 if success: successed += 1
             except Exception as ex:
                 print(ex)

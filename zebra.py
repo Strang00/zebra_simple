@@ -1,9 +1,7 @@
-import sys
 import zebra_utils
-
-# To define API keys in code fix config.py and uncomment following 2 lines
-#import config
-#config.update_environ()
+import sys
+import config
+config.update_environ()
 
 filename = None
 size = None

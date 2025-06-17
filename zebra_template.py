@@ -1,4 +1,4 @@
-ZEBRA_GRID = """
+ZEBRA_GRID_ORIGINAL = """
 # Example Puzzle 
 
 There are 3 houses, numbered 1 to 3 from left to right, as seen from across the street. Each house is occupied by a different person. Each house has a unique attribute for each of the following characteristics:
@@ -43,6 +43,25 @@ Now please solve the above puzzle. Present your reasoning and solution in the fo
 
 Reasoning: ...
 
+```json
 {json_template}
+```
 
 """
+
+ZEBRA_GRID_EGOR = """
+
+THE PUZZLE: 
+{puzzle}
+
+INSTRUCTIONS:
+Solve the puzzle independently by following all clues carefully. In the beginning describe semantics of all relations like: in between, left, right next, etc - in a formal logic way using math expressions. After this describe all clues and conditions in a formal logic way with math expressions based on the relations. Proceed step by step using formal logic expressions, showing your reasoning at each stage. For every step: Represent the current state clearly in a table format for each house - number, name, education, color, nationality, birth_month.  Do not alter any positions or assignments that have already been confirmed as definitely correct. Include all relevant constraints and known facts before applying that step. Verify that the table satisfies the constraints up to that point. Keep records about conclusions that you found definitely wrong. Continue reasoning thoroughly until you reach a final consistent solution. After completing, double-check the entire solution against all constraints to ensure accuracy. When the final answer is found and verified provide it in full accordance with the template.
+
+FINAL ANSWER TEMPLATE:
+```json
+{json_template}
+```
+
+"""
+
+ZEBRA_GRID = ZEBRA_GRID_ORIGINAL

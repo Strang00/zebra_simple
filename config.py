@@ -20,3 +20,7 @@ def update_environ():
     if os.environ.get("OPENAI_API_KEY") == None: os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
     if os.environ.get("CUSTOM_API_KEY") == None: os.environ["CUSTOM_API_KEY"] = CUSTOM_API_KEY
     if os.environ.get("CUSTOM_API_URL") == None: os.environ["CUSTOM_API_URL"] = CUSTOM_API_URL
+    #os.environ["PYTHONIOENCODING"] = "utf-8"
+    #os.environ["PYTHONLEGACYWINDOWSSTDIO"] = "utf-8"
+    #os.environ["PYTHONUTF8"] = "1"
+    #os.system('chcp 65001')
