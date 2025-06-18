@@ -148,6 +148,7 @@ def openai_chat_request(
         ]
 
     source = None
+    response_mode = False
 
     # for version > 1.0
     if model.endswith("@groq"):
@@ -266,16 +267,33 @@ def openai_chat_request(
             **kwargs,
         )
     elif source == "xai":
-        if model.startswith("grok-3-mini") and reasoning_effort not in ['high', 'low']:
-            raise ValueError("You should specify the reasoning effort for grok-3-mini 'high' or 'low'")
-        assert model in ["grok-3-mini-beta", "grok-3-mini-fast-beta", "grok-2-1212", "grok-3-beta", "grok-3-fast-beta"], f"Model {model} is not supported"
+        # Let the xai API check available models and reasoning_effort itself
+        #if model.startswith("grok-3-mini") and reasoning_effort not in ['high', 'low']:
+        #    raise ValueError("You should specify the reasoning effort for grok-3-mini 'high' or 'low'")
+        #assert model in ["grok-3-mini-beta", "grok-3-mini-fast-beta", "grok-2-1212", "grok-3-beta", "grok-3-fast-beta"], f"Model {model} is not supported"
         response = client.chat.completions.create(
             model=model,
             messages=messages,
             temperature=temperature,
             reasoning_effort=reasoning_effort,
+            max_completion_tokens=max_tokens,       # new version
         )
-    elif model.startswith("o1-") or model.startswith("o3-"):
+    elif model.startswith("response-") or model.startswith("response-"):
+        model = model.replace("response-", "")
+        response_mode = True
+        # print(f"Requesting chat response from OpenAI API with model {model}")
+        if messages[0]["role"] == "system":
+            messages = messages[1:]
+        response = client.responses.create(
+            model=model,
+            input=messages,
+            #temperature=temperature,               # not supported for o3
+            #top_p=top_p,                           # not supported for o3
+            max_output_tokens=max_tokens,      # new version
+            reasoning={"effort": reasoning_effort, "summary": "auto"},
+            **kwargs,
+        )
+    elif model.startswith("o1") or model.startswith("o3"):
         # print(f"Requesting chat completion from OpenAI API with model {model}")
         if messages[0]["role"] == "system":
             messages = messages[1:]
@@ -283,13 +301,13 @@ def openai_chat_request(
             model=model,
             response_format={"type": "json_object"} if json_mode else None,
             messages=messages,
-            temperature=temperature,
-            top_p=top_p,
-            max_completion_tokens=max_tokens,  # new version
-            frequency_penalty=frequency_penalty,
-            presence_penalty=presence_penalty,
+            #temperature=temperature,               # not supported by o3
+            #top_p=top_p,                           # not supported by o3
+            #frequency_penalty=frequency_penalty,   # not supported by o3
+            #presence_penalty=presence_penalty,     # not supported by o3
+            max_completion_tokens=max_tokens,       # new version
             reasoning_effort=reasoning_effort,
-            stop=stop,
+            #stop=stop,                             # not supported by o3
             **kwargs,
         )
         #hidden_reasoning_tokens = (
@@ -343,31 +361,40 @@ def openai_chat_request(
             **kwargs,
         )
 
-    print(f"Received response from OpenAI API with model {model}")
+    print(f"Received response from {source} API for model {model} with reasoning_effort={reasoning_effort}:")
     print(str(response).encode('utf-8', 'ignore'))
     contents = []
     thoughts = []
-    for choice in response.choices:
-        #print(choice)
-        # Check if the response is valid
-        if choice.finish_reason not in ["stop", "length"]:
-            if "content_filter" in choice.finish_reason:
-                raise ValueError(
-                    f"OpenAI API response rejected due to content_filter policy."
-                )
+
+    if response_mode:
+        for output in response.output:
+            if output.type == "reasoning":
+                for summary in output.summary:
+                    thoughts.append(summary.text)
             else:
+                for content in output.content:
+                    contents.append(content.text)
+    else:        
+        for choice in response.choices:
+            # Check if the response is valid
+            if choice.finish_reason not in ["stop", "length"]:
+                if "content_filter" in choice.finish_reason:
+                    raise ValueError(
+                        f"OpenAI API response rejected due to content_filter policy."
+                    )
+                else:
+                    raise ValueError(
+                        f"OpenAI API response finish_reason: {choice.finish_reason}"
+                    )
+            elif choice.message.content is None:
                 raise ValueError(
-                    f"OpenAI API response finish_reason: {choice.finish_reason}"
+                    f"OpenAI API response have no content: {choice.finish_reason}"
                 )
-        elif choice.message.content is None:
-            raise ValueError(
-                f"OpenAI API response have no content: {choice.finish_reason}"
-            )
 
-        contents.append(choice.message.content)
+            contents.append(choice.message.content)
 
-        if hasattr(choice.message, 'reasoning_content') and choice.message.reasoning_content is not None:
-            thoughts.append(choice.message.reasoning_content)
+            if hasattr(choice.message, 'reasoning_content') and choice.message.reasoning_content is not None:
+                thoughts.append(choice.message.reasoning_content)
 
     #if o1_mode:
     #    return contents, hidden_reasoning_tokens, response.usage

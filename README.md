@@ -5,7 +5,7 @@ Implementation of [Zebra Puzzle](https://en.wikipedia.org/wiki/Zebra_Puzzle) for
 What it does exactly:
 - loads [ZebraLogic dataset](https://huggingface.co/datasets/WildEval/ZebraLogic) for local work if none yet
 - queries and checks N zebra puzzles of specified SIZE for each MODEL in list
-- stores json log for each model and summary, extracts model answer and think
+- stores json log for each model and summary, extracts model answer and `think`
 
 Key differences from [ZeroEval](https://github.com/WildEval/ZeroEval):
 - requires only `openai` and `duckdb` pip packages and access to APIs
@@ -62,11 +62,12 @@ python -u zebra.py -m llama-3.3-70b-versatile@groq -s 3*3 -i 0,1 -t 4096
 
 **Common rules**
 
-- model should contain OpenAI API compatible model name, optional reasoining_effort suffix and `@source`
+- model should contain OpenAI API compatible model name, optional `reasoning_effort` suffix and `@source`
 - each source addressed via OpenAI API with key from environment variable as `GOOGLE_API_KEY` for `@google`
 - `reasoning_effort` controlled by suffix after the model name: `none`, `default`, `low`, `medium`, `high`
-- @google and @nvidia have specific way of defining thinking mode to allow catch `<think>` or `<thought>` tags
-- full model name example: `gemini-2.5-flash-preview-05-20-low@google`
+- `@google` and `@nvidia` have specific way of enabling thinking to allow catching `<think>` or `<thought>`
+- use `response-` model prefix for `@openai` to request via [Response API](https://platform.openai.com/docs/guides/reasoning?api-mode=chat#reasoning-summaries) and extract `reasoning.summary`
+- full model name example with reasoning suffix and source: `gemini-2.5-flash-preview-05-20-low@google`
 
 **Models by source**
 
@@ -93,6 +94,7 @@ python -u zebra.py -m llama-3.3-70b-versatile@groq -s 3*3 -i 0,1 -t 4096
 
 ```sh
 gpt-4.1-nano-high@openai                            # no free
+response-o3-medium@openai                           # reasoning.summary returned in think field
 claude-sonnet-4-0-high@anthropic                    # no free
 deepseek-reasoner-high@deepseek                     # no free
 grok-3-mini-high@xai                                # no free
@@ -113,20 +115,21 @@ allam-2-7b@groq                                     # no reasoning, weak and goo
 
 ## Acknowledgements
 
-1. First thanks to Creative Workshop team inspired to do this simple test
+1. First thanks to Creative Workshop team inspired me to do this simple test
 2. Authors of ZebraLogic and [paper](https://arxiv.org/abs/2502.01100) created good and reusable results, nice work!
-3. Big Thanks for WildEval published useful [dataset](https://huggingface.co/datasets/WildEval/ZebraLogic) with solutions 
-4. And warmest thanks to author of [Sherlock game](https://www.kaser.com/sherwin.html) implementing puzzle.
-   Many happy hours I spent with this game, now it available as [Watson desktop](https://github.com/koro-xx/Watson) and [Sherlok mobile](https://apps.apple.com/ru/app/sherlock-free/id631434866)
+3. Big Thanks for WildEval for publishing [dataset](https://huggingface.co/datasets/WildEval/ZebraLogic) with solutions
+4. And warmest thanks to author of [Sherlock game](https://www.kaser.com/sherwin.html) implementing the puzzle.
+   Many happy hours in the last millennium I spent with this game, now it is available as [Watson desktop](https://github.com/koro-xx/Watson) and [Sherlok mobile](https://apps.apple.com/ru/app/sherlock-free/id631434866)
 
 ## History
 
-- 2025-06-12 Initial version with dataset load (ow, original ZebraLogic by allenai/ZeroEval have no solution)
+- 2025-06-12 Initial version with dataset load (ow, original ZebraLogic by allenai/ZeroEval has no solution)
 - 2025-06-13 Extracted and modified prompt from [ZeroEval](https://github.com/WildEval/ZeroEval), completion request and results comparison logic
 - 2025-06-14 Created results saving logic, tested models from different sources, improved completion request
 - 2025-06-15 Research for `reasoning_effort` and similars to control thinking, extract `<think>` or `<thought>`
-- 2025-06-16 Polished results for easy usage by Creative Workshop team, prepared for publishing repos
-- 2025-06-16 Added support command-line arguments and usage help, added direct models in args and items list
+- 2025-06-16 Polished results for easy usage by Creative Workshop team, prepared for publishing on github
+- 2025-06-16 Added support for command-line args and usage help, added direct models in args and items list
+- 2025-06-17 Used new Response API to extract [reasoning summary](https://platform.openai.com/docs/guides/reasoning?api-mode=chat#reasoning-summaries) for OpenAI o3- and o1- models 
 
 
 ## Tasks
@@ -136,5 +139,5 @@ allam-2-7b@groq                                     # no reasoning, weak and goo
 - [x] Add config.py and results to .gitignore
 - [x] Add delay option between tests (bypassing RPM/TPM free limits)
 - [x] Add and fill LICENSE, check used parts license and reference here
-- [x] Collect links to models and keys retrival, models examples with comments
+- [x] Collect links to models and keys retrieval, models examples with comments
 - [x] Implement command-line args retrieval and usage help output

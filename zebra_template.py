@@ -1,3 +1,4 @@
+# Original prompt from ZeroEval, fixed a bit for better json extraction
 ZEBRA_GRID_ORIGINAL = """
 # Example Puzzle 
 
@@ -49,6 +50,7 @@ Reasoning: ...
 
 """
 
+# New CoT-enabling prompt, much better for non-reasoning models, but worse for reasoning models
 ZEBRA_GRID_EGOR = """
 
 THE PUZZLE: 
@@ -64,4 +66,4 @@ FINAL ANSWER TEMPLATE:
 
 """
 
-ZEBRA_GRID = ZEBRA_GRID_ORIGINAL
+ZEBRA_GRID = ZEBRA_GRID_EGOR
